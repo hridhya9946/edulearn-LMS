@@ -11,7 +11,12 @@ const HomePage = () => {
     const fetchCourses = async () => {
       try {
         const data = await getPublishedCourses();
-        setFeaturedCourses(data.slice(0, 4)); // Show first 4 courses
+        if (Array.isArray(data)) {
+          setFeaturedCourses(data.slice(0, 4)); // Show first 4 courses
+        } else {
+          console.error("Invalid courses data format:", data);
+          setFeaturedCourses([]);
+        }
       } catch (err) {
         console.error("Failed to fetch courses:", err);
       } finally {
