@@ -22,35 +22,34 @@ function EditCourse() {
   });
 
   useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        const data = await getCourseById(id);
+        const course = data.course;
+
+        // Ensure modules exist and have a default if empty
+        const modules = course.modules && course.modules.length > 0
+          ? course.modules
+          : [{ title: '', description: '', lessons: [{ title: '', type: 'video', contentUrl: '', duration: 0 }] }];
+
+        setCourseData({
+          title: course.title || '',
+          description: course.description || '',
+          category: course.category || 'General',
+          level: course.level || 'beginner',
+          price: course.price || 0,
+          thumbnail: course.thumbnail || '',
+          modules: modules,
+          status: course.status || 'draft'
+        });
+        setLoading(false);
+      } catch {
+        setError('Failed to load course details');
+        setLoading(false);
+      }
+    };
     fetchCourseDetails();
   }, [id]);
-
-  const fetchCourseDetails = async () => {
-    try {
-      const data = await getCourseById(id);
-      const course = data.course;
-
-      // Ensure modules exist and have a default if empty
-      const modules = course.modules && course.modules.length > 0
-        ? course.modules
-        : [{ title: '', description: '', lessons: [{ title: '', type: 'video', contentUrl: '', duration: 0 }] }];
-
-      setCourseData({
-        title: course.title || '',
-        description: course.description || '',
-        category: course.category || 'General',
-        level: course.level || 'beginner',
-        price: course.price || 0,
-        thumbnail: course.thumbnail || '',
-        modules: modules,
-        status: course.status || 'draft'
-      });
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load course details');
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (e) => {
     setCourseData({ ...courseData, [e.target.name]: e.target.value });

@@ -11,19 +11,18 @@ function QuizAttempts() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        const fetchAttempts = async () => {
+            try {
+                const data = await getQuizAttempts(id);
+                setAttempts(data.attempts);
+                setLoading(false);
+            } catch {
+                setError('Failed to load quiz attempts');
+                setLoading(false);
+            }
+        };
         fetchAttempts();
     }, [id]);
-
-    const fetchAttempts = async () => {
-        try {
-            const data = await getQuizAttempts(id);
-            setAttempts(data.attempts);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load quiz attempts');
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div className="text-center mt-5">Loading...</div>;
 

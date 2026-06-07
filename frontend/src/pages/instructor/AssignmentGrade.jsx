@@ -19,20 +19,30 @@ function AssignmentGrade() {
         feedback: ''
     });
 
-    useEffect(() => {
-        fetchSubmissions();
-    }, [id]);
-
     const fetchSubmissions = async () => {
         try {
             const data = await getSubmissions(id);
             setSubmissions(data.submissions);
             setLoading(false);
-        } catch (err) {
+        } catch {
             setError('Failed to load submissions');
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const loadSubmissions = async () => {
+            try {
+                const data = await getSubmissions(id);
+                setSubmissions(data.submissions);
+                setLoading(false);
+            } catch {
+                setError('Failed to load submissions');
+                setLoading(false);
+            }
+        };
+        loadSubmissions();
+    }, [id]);
 
     const handleOpenGradingModal = (submission) => {
         setSelectedSubmission(submission);

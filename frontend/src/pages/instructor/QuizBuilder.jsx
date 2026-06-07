@@ -32,20 +32,19 @@ function QuizBuilder() {
 
     useEffect(() => {
         if (id) {
-            fetchQuizDetails();
+            const loadQuizDetails = async () => {
+                try {
+                    const data = await getQuizById(id);
+                    setQuizData(data.quiz);
+                    setLoading(false);
+                } catch {
+                    setError('Failed to load quiz details');
+                    setLoading(false);
+                }
+            };
+            loadQuizDetails();
         }
     }, [id]);
-
-    const fetchQuizDetails = async () => {
-        try {
-            const data = await getQuizById(id);
-            setQuizData(data.quiz);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load quiz details');
-            setLoading(false);
-        }
-    };
 
     const handleQuizChange = (e) => {
         setQuizData({ ...quizData, [e.target.name]: e.target.value });

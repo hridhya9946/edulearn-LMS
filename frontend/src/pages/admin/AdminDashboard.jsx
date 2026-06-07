@@ -20,6 +20,35 @@ function AdminDashboard() {
   const revenueRef = useRef(null);
 
   useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const [statsRes, growthRes, revRes] = await Promise.all([
+          getDashboardStats(),
+          getUserGrowth(),
+          getRevenueReport()
+        ]);
+
+        setStats(statsRes.stats);
+
+        // Transform growth data
+        const transformedGrowth = Object.entries(growthRes.growth).map(([month, data]) => ({
+          name: month,
+          total: data.total
+        })).sort((a, b) => a.name.localeCompare(b.name)).slice(-6); // Last 6 months
+        setGrowthData(transformedGrowth);
+
+        // Transform revenue data (by course)
+        const transformedRev = revRes.report.revenueByCourse
+          .sort((a, b) => b.revenue - a.revenue)
+          .slice(0, 5); // Top 5 courses
+        setRevenueData(transformedRev);
+
+        setLoading(false);
+      } catch {
+        setError('Failed to load dashboard stats');
+        setLoading(false);
+      }
+    };
     fetchDashboardStats();
   }, []);
 
@@ -45,36 +74,6 @@ function AdminDashboard() {
       return () => observer.disconnect();
     }
   }, [isMounted]);
-
-  const fetchDashboardStats = async () => {
-    try {
-      const [statsRes, growthRes, revRes] = await Promise.all([
-        getDashboardStats(),
-        getUserGrowth(),
-        getRevenueReport()
-      ]);
-
-      setStats(statsRes.stats);
-
-      // Transform growth data
-      const transformedGrowth = Object.entries(growthRes.growth).map(([month, data]) => ({
-        name: month,
-        total: data.total
-      })).sort((a, b) => a.name.localeCompare(b.name)).slice(-6); // Last 6 months
-      setGrowthData(transformedGrowth);
-
-      // Transform revenue data (by course)
-      const transformedRev = revRes.report.revenueByCourse
-        .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 5); // Top 5 courses
-      setRevenueData(transformedRev);
-
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load dashboard stats');
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

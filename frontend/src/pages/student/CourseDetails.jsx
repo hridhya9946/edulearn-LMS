@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Container, Row, Col, Card, Button, Badge, ListGroup, Placeholder, Accordion } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Badge, ListGroup, Placeholder, Accordion, Alert } from "react-bootstrap";
 import { getCourseById } from "../../api/courseApi";
 import { enroll, checkEnrollment } from "../../api/enrollmentApi"; // Need to ensure these exist
 import { useAuth } from "../../context/AuthContext";
@@ -16,24 +16,23 @@ const CourseDetails = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchCourseAndEnrollment();
-  }, [id]);
+    const fetchCourseAndEnrollment = async () => {
+      try {
+        const courseData = await getCourseById(id);
+        setCourse(courseData);
 
-  const fetchCourseAndEnrollment = async () => {
-    try {
-      const courseData = await getCourseById(id);
-      setCourse(courseData);
-
-      if (user && user.role === 'student') {
-        const enrollmentStatus = await checkEnrollment(id);
-        setEnrolled(enrollmentStatus.enrolled);
+        if (user && user.role === 'student') {
+          const enrollmentStatus = await checkEnrollment(id);
+          setEnrolled(enrollmentStatus.enrolled);
+        }
+      } catch {
+        setError("Failed to load course details.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError("Failed to load course details.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    fetchCourseAndEnrollment();
+  }, [id, user]);
 
   const handleEnroll = async () => {
     if (!user) return navigate("/login");
@@ -108,6 +107,7 @@ const CourseDetails = () => {
         <Row className="g-4">
           {/* Left Column: Course Content */}
           <Col lg={8}>
+            {error && <Alert variant="danger" dismissible onClose={() => setError("")}>{error}</Alert>}
             <Card className="border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
               <Card.Header className="bg-white py-3 px-4 fw-bold h5">What you'll learn</Card.Header>
               <Card.Body className="p-4">

@@ -26,6 +26,31 @@ function PlatformAnalytics() {
     const revRef = useRef(null);
 
     useEffect(() => {
+        const fetchAllAnalytics = async () => {
+            try {
+                setLoading(true);
+                const [revRes, growthRes, statsRes] = await Promise.all([
+                    getRevenueReport(),
+                    getUserGrowth(),
+                    getCourseStats()
+                ]);
+
+                setRevenueData(revRes.report);
+
+                // Transform monthly growth data for Recharts
+                const transformedGrowth = Object.entries(growthRes.growth).map(([month, data]) => ({
+                    name: month,
+                    ...data
+                })).sort((a, b) => a.name.localeCompare(b.name));
+                setGrowthData(transformedGrowth);
+
+                setCourseStats(statsRes.stats);
+                setLoading(false);
+            } catch {
+                setError('Failed to load platform analytics');
+                setLoading(false);
+            }
+        };
         fetchAllAnalytics();
     }, []);
 
@@ -53,32 +78,6 @@ function PlatformAnalytics() {
             return () => observer.disconnect();
         }
     }, [isMounted]);
-
-    const fetchAllAnalytics = async () => {
-        try {
-            setLoading(true);
-            const [revRes, growthRes, statsRes] = await Promise.all([
-                getRevenueReport(),
-                getUserGrowth(),
-                getCourseStats()
-            ]);
-
-            setRevenueData(revRes.report);
-
-            // Transform monthly growth data for Recharts
-            const transformedGrowth = Object.entries(growthRes.growth).map(([month, data]) => ({
-                name: month,
-                ...data
-            })).sort((a, b) => a.name.localeCompare(b.name));
-            setGrowthData(transformedGrowth);
-
-            setCourseStats(statsRes.stats);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load platform analytics');
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div className="text-center mt-5">Loading Analytics...</div>;
 

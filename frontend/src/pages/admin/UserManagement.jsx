@@ -18,20 +18,30 @@ function UserManagement() {
         role: 'student'
     });
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
     const fetchUsers = async () => {
         try {
             const data = await getAllUsers();
             setUsers(data.users);
             setLoading(false);
-        } catch (err) {
+        } catch {
             setError('Failed to load users');
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const data = await getAllUsers();
+                setUsers(data.users);
+                setLoading(false);
+            } catch {
+                setError('Failed to load users');
+                setLoading(false);
+            }
+        };
+        loadUsers();
+    }, []);
 
     const handleShowModal = (mode, user = null) => {
         setModalMode(mode);
@@ -81,7 +91,7 @@ function UserManagement() {
             try {
                 await deleteUser(userId);
                 fetchUsers();
-            } catch (err) {
+            } catch {
                 setError('Failed to delete user');
             }
         }
@@ -91,21 +101,8 @@ function UserManagement() {
         try {
             await changeUserRole(userId, newRole);
             fetchUsers();
-        } catch (err) {
+        } catch {
             setError('Failed to change user role');
-        }
-    };
-
-    const getRoleBadgeColor = (role) => {
-        switch (role) {
-            case 'admin':
-                return 'danger';
-            case 'instructor':
-                return 'info';
-            case 'student':
-                return 'success';
-            default:
-                return 'secondary';
         }
     };
 

@@ -71,7 +71,7 @@ const StudentDashboard = () => {
       } else {
         navigate(`/student/learn/${courseId}`);
       }
-    } catch (err) {
+    } catch {
       navigate(`/student/learn/${courseId}`);
     }
   };

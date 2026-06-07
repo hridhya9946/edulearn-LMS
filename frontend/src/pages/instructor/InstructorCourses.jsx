@@ -10,20 +10,30 @@ function InstructorCourses() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    useEffect(() => {
-        fetchCourses();
-    }, []);
-
     const fetchCourses = async () => {
         try {
             const data = await getMyCourses();
             setCourses(data.courses);
             setLoading(false);
-        } catch (err) {
+        } catch {
             setError('Failed to load courses');
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const loadCourses = async () => {
+            try {
+                const data = await getMyCourses();
+                setCourses(data.courses);
+                setLoading(false);
+            } catch {
+                setError('Failed to load courses');
+                setLoading(false);
+            }
+        };
+        loadCourses();
+    }, []);
 
     const handleDelete = async (courseId) => {
         if (window.confirm('Are you sure you want to delete this draft course?')) {

@@ -12,8 +12,34 @@ function QuizManager() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    const fetchQuizzes = async (courseId) => {
+        try {
+            setLoading(true);
+            const data = await getCourseQuizzes(courseId);
+            setQuizzes(data.quizzes);
+            setLoading(false);
+        } catch {
+            setError('Failed to load quizzes');
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetchCourses();
+        const loadCourses = async () => {
+            try {
+                const data = await getMyCourses();
+                const activeCourses = data.courses.filter(c => c.status !== 'draft');
+                setCourses(activeCourses);
+                if (activeCourses.length > 0) {
+                    setSelectedCourseId(activeCourses[0]._id);
+                }
+                setLoading(false);
+            } catch {
+                setError('Failed to load courses');
+                setLoading(false);
+            }
+        };
+        loadCourses();
     }, []);
 
     useEffect(() => {
@@ -23,33 +49,6 @@ function QuizManager() {
             setQuizzes([]);
         }
     }, [selectedCourseId]);
-
-    const fetchCourses = async () => {
-        try {
-            const data = await getMyCourses();
-            const activeCourses = data.courses.filter(c => c.status !== 'draft');
-            setCourses(activeCourses);
-            if (activeCourses.length > 0) {
-                setSelectedCourseId(activeCourses[0]._id);
-            }
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load courses');
-            setLoading(false);
-        }
-    };
-
-    const fetchQuizzes = async (courseId) => {
-        try {
-            setLoading(true);
-            const data = await getCourseQuizzes(courseId);
-            setQuizzes(data.quizzes);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load quizzes');
-            setLoading(false);
-        }
-    };
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this quiz?')) {

@@ -30,21 +30,20 @@ function SystemSettings() {
     const [success, setSuccess] = useState('');
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const data = await getSettings();
+                if (data.settings) {
+                    setSettings(prev => ({ ...prev, ...data.settings }));
+                }
+                setLoading(false);
+            } catch {
+                setError('Failed to load system settings');
+                setLoading(false);
+            }
+        };
         fetchSettings();
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const data = await getSettings();
-            if (data.settings) {
-                setSettings(prev => ({ ...prev, ...data.settings }));
-            }
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load system settings');
-            setLoading(false);
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -74,7 +73,7 @@ function SystemSettings() {
             await updateSettings(settings);
             setSuccess('Settings updated successfully');
             setSaving(false);
-        } catch (err) {
+        } catch {
             setError('Failed to update settings');
             setSaving(false);
         }

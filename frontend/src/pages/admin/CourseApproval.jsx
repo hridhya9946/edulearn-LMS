@@ -12,27 +12,37 @@ function CourseApproval() {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [rejectionReason, setRejectionReason] = useState('');
 
-    useEffect(() => {
-        fetchPendingCourses();
-    }, []);
-
     const fetchPendingCourses = async () => {
         try {
             const data = await getPendingCourses();
             setCourses(data.courses);
             setLoading(false);
-        } catch (err) {
+        } catch {
             setError('Failed to load pending courses');
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const loadCourses = async () => {
+            try {
+                const data = await getPendingCourses();
+                setCourses(data.courses);
+                setLoading(false);
+            } catch {
+                setError('Failed to load pending courses');
+                setLoading(false);
+            }
+        };
+        loadCourses();
+    }, []);
 
     const handleApprove = async (courseId) => {
         if (window.confirm('Are you sure you want to approve this course?')) {
             try {
                 await approveCourse(courseId);
                 fetchPendingCourses();
-            } catch (err) {
+            } catch {
                 setError('Failed to approve course');
             }
         }
@@ -44,7 +54,7 @@ function CourseApproval() {
             setShowModal(false);
             setRejectionReason('');
             fetchPendingCourses();
-        } catch (err) {
+        } catch {
             setError('Failed to reject course');
         }
     };

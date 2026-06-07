@@ -23,8 +23,35 @@ function AssignmentManager() {
         maxScore: 100
     });
 
+
+    const fetchAssignments = async (courseId) => {
+        try {
+            setLoading(true);
+            const data = await getCourseAssignments(courseId);
+            setAssignments(data.assignments);
+            setLoading(false);
+        } catch {
+            setError('Failed to load assignments');
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetchCourses();
+        const loadCourses = async () => {
+            try {
+                const data = await getMyCourses();
+                setCourses(data.courses.filter(c => c.status !== 'draft'));
+                if (data.courses.length > 0) {
+                    const firstActive = data.courses.find(c => c.status !== 'draft');
+                    if (firstActive) setSelectedCourseId(firstActive._id);
+                }
+                setLoading(false);
+            } catch {
+                setError('Failed to load courses');
+                setLoading(false);
+            }
+        };
+        loadCourses();
     }, []);
 
     useEffect(() => {
@@ -34,34 +61,6 @@ function AssignmentManager() {
             setAssignments([]);
         }
     }, [selectedCourseId]);
-
-    const fetchCourses = async () => {
-        try {
-            const data = await getMyCourses();
-            setCourses(data.courses.filter(c => c.status !== 'draft')); // Only manage assignments for non-drafts
-            if (data.courses.length > 0) {
-                // Find first non-draft course
-                const firstActive = data.courses.find(c => c.status !== 'draft');
-                if (firstActive) setSelectedCourseId(firstActive._id);
-            }
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load courses');
-            setLoading(false);
-        }
-    };
-
-    const fetchAssignments = async (courseId) => {
-        try {
-            setLoading(true);
-            const data = await getCourseAssignments(courseId);
-            setAssignments(data.assignments);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to load assignments');
-            setLoading(false);
-        }
-    };
 
     const handleOpenModal = (assignment = null) => {
         if (assignment) {
@@ -133,7 +132,7 @@ function AssignmentManager() {
                     </Button>
                     <h2 className="mb-0">Assignment Management</h2>
                 </div>
-                <Button variant="primary" onClick={() => setShowCreateModal(true)} disabled={!selectedCourseId}>
+                <Button variant="primary" onClick={() => handleOpenModal()} disabled={!selectedCourseId}>
                     Create New Assignment
                 </Button>
             </div>

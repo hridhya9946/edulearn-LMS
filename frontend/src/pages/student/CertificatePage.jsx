@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Container, Button, Card, Spinner, Alert, Row, Col } from "react-bootstrap";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -7,7 +7,6 @@ import { useAuth } from "../../context/AuthContext";
 const CertificatePage = () => {
   const { id: courseId } = useParams();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

@@ -27,6 +27,16 @@ function InstructorDashboard() {
   ];
 
   useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const data = await getDashboardStats();
+        setStats(data.stats);
+        setLoading(false);
+      } catch {
+        setError('Failed to load dashboard stats');
+        setLoading(false);
+      }
+    };
     fetchDashboardStats();
   }, []);
 
@@ -52,17 +62,6 @@ function InstructorDashboard() {
       return () => observer.disconnect();
     }
   }, [isMounted]);
-
-  const fetchDashboardStats = async () => {
-    try {
-      const data = await getDashboardStats();
-      setStats(data.stats);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load dashboard stats');
-      setLoading(false);
-    }
-  };
 
   if (loading) return (
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>

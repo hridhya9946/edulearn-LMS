@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../../services/api";
 import { Container, Row, Col, Card, Nav, Tab, Button, Accordion, ListGroup, ProgressBar, Badge, Spinner, Alert } from "react-bootstrap";
@@ -8,7 +8,7 @@ const StudentCoursePlayer = () => {
   const { id: courseId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuth(); // eslint-disable-line no-unused-vars
 
   const [course, setCourse] = useState(null);
   const [currentLesson, setCurrentLesson] = useState(null);
@@ -25,7 +25,7 @@ const StudentCoursePlayer = () => {
 
   useEffect(() => {
     fetchCourseAndProgress();
-  }, [courseId]);
+  }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchCourseAndProgress = async () => {
     try {
@@ -128,7 +128,7 @@ const StudentCoursePlayer = () => {
     }
 
     // Detect YouTube
-    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/i;
     const ytMatch = videoSrc.match(youtubeRegex);
 
     if (ytMatch) {
